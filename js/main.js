@@ -151,15 +151,16 @@
       $form.append($fg)
     });
 
+    $fg = $('<div class="form-group"></div>');
     if (config.resultID) {
       blockForm(true);
+      $fg.append('<button type="submit" class="btn btn-success">Update</button>');
     } else {
-      $fg = $('<div class="form-group"></div>');
       $fg.append('<button type="submit" class="btn btn-success">Submit</button>');
       $fg.append(' ');
       $fg.append('<button type="reset" class="btn btn-danger">Reset</button>');
-      $form.append($fg)
     }
+    $form.append($fg)
   };
 
   var resetQuestions = function() {
@@ -285,6 +286,14 @@
 
   $(function() {
     if (config.resultID) {
+
+      $('#quiz_form').on('submit', function(evt) {
+        evt.preventDefault();
+
+        storage.set(getStorageAnswerKey(), config.resultData.answers);
+        window.location = config.baseURL;
+      });
+
       $('#quiz-selector').hide();
       //config.resultData.acceptTime = Math.round((new Date()).getTime() / 1000);
 

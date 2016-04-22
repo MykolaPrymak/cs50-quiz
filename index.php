@@ -1,7 +1,8 @@
 <?php
-
+/*
 error_reporting(E_ALL | E_STRICT | E_NOTICE);
 ini_set('display_errors', '1');
+*/
 
 $secret = 'niQECdIKSkdOBO0xFL/w2Ez8AqkHn9BUJT3WyGrgcLH8c8Oj2ofv4ZmRQJv4PVCCa+PiLk2BPPf';
 $base_dir = dirname(__FILE__);
@@ -12,6 +13,9 @@ if ($route[0] == 'subimt') {
 
   $raw_post = file_get_contents('php://input');
   $json = json_decode($raw_post, true);
+
+  // Save only specified fields
+  $json = array('email' => $json['email'], 'quiz' => $json['quiz'], 'answers' => $json['answers']);
 
   header('Content-Type: application/json');
 
@@ -28,24 +32,23 @@ if ($route[0] == 'subimt') {
   }
 
   $json['quiz'] = intval($json['quiz']);
-  $json['submit_time'] = time();
+  $json['submitTime'] = time();
 
-  $quiz_unique = hash('sha256', $secret . $json['quiz'] . $json['submit_time'] . $json['email']);
+  $quiz_unique = hash('sha256', $secret . $json['quiz'] . $json['submitTime'] . $json['email']);
   $result_dir = $base_dir . '/results/q' . $json['quiz'] . '/';
 
   // Check result directory and create it if not exist
-  if (
-      ((file_exists($result_dir) && is_writable($result_dir) && is_dir($result_dir)) || !mkdir($result_dir, 0770, true)) &&
-      (file_put_contents($result_dir . $quiz_unique . '.json', json_encode($json)) === false)
-      ) {
+  $is_result_dir_ok = ((file_exists($result_dir) && is_writable($result_dir) && is_dir($result_dir)) || mkdir($result_dir, 0770, true));
+
+  if (!$is_result_dir_ok || (file_put_contents($result_dir . $quiz_unique . '.json', json_encode($json)) === false)) {
     header ('HTTP/1.0 500 Internal Server Error');
     echo json_encode(array('message' => 'Cannot save results'));
     exit;
   }
 
   echo json_encode(array('url' => implode('/', array($base_url, 'quiz', $json['quiz'], $quiz_unique))));
-  exit;
 
+  exit;
 } else if ($route[0] == 'quiz') {
   $quiz_num = isset($route[1]) ? intval($route[1]) : 0;
 
@@ -64,7 +67,7 @@ if ($route[0] == 'subimt') {
       $config = array(
         'baseURL' => $base_url,
         'resultID' => $route[2],
-        'resultData' => file_get_contents($result_file)
+        'resultData' => json_decode(file_get_contents($result_file))
       );
       echo str_replace(array('%baseURL%', '%config%'), array($base_url, 'var config = ' . json_encode($config) . ';'), file_get_contents('quiz.html'));
     } else {

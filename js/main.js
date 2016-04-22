@@ -37,19 +37,31 @@
     return _.map(lines, function(text, idx) {
       return $('<p>' + text + '</p>');
     });
-  }
+  };
 
-  var addDescription = function($node, description, revenue) {
+  var addDescription = function($node, description, revenue, idx) {
     var lines = mapLines(description);
 
+
+    if (config.resultID) {
+      if (config.resultData.acceptTime) {
+        var key = 'q_' + idx;
+        // TODO: Change to resultData.answerResults
+        //if (!( key in config.resultData.answers))
+      } else {
+        //lines[0].prepend('<span class="label label-success">Correct</span> ');
+        //lines[0].prepend('<span class="label label-danger">Incorect</span> ');
+        lines[0].prepend('<span class="label label-default">On review</span> ');
+      }
+    }
     lines[0].prepend('<span class="label label-primary">'+ revenue +' point' + (revenue > 1 ? 's' : '') + '</span> ');
 
     $node.append(lines);
-  }
+  };
 
   var addSubtitle = function($node, subtitle) {
     $node.append(mapLines(subtitle));
-  }
+  };
 
   var isCheckedItem = function(values, value) {
     var checked = false;
@@ -64,7 +76,7 @@
     }
 
     return checked;
-  }
+  };
 
   var addQuestionInput = function($node, idx, type, question, value) {
     question = _.extend({}, {type: answerTypes.text, inputType: 'text'}, question);
@@ -112,7 +124,7 @@
       default:
         $node.append('<input type="' + question.inputType + '" name="q_' + idx + '" class="form-control" value="' + value + '" placeholder="' + (question.placeholder ? question.placeholder : '') + '">');
     }
-  }
+  };
 
   var showQuestions = function() {
     var $form = $('#quiz_form');
@@ -130,7 +142,7 @@
         addSubtitle($fg, question.subtitle);
       }
 
-      addDescription($fg, question.description, question.revenue);
+      addDescription($fg, question.description, question.revenue, idx);
       addQuestionInput($fg, idx, question.type, question, answers['q_' + idx]);
 
       $fg.find('img').each(function(idx, img) {
@@ -153,7 +165,7 @@
   var resetQuestions = function() {
     storage.set(getStorageAnswerKey(), {});
     showQuestions();
-  }
+  };
 
   var form2Hash = function(form) {
     var hash = {};
@@ -177,11 +189,11 @@
 
   var blockForm = function(force) {
     $('#quiz_form').find('input, textarea').prop({readOnly: true, disabled: !!force});
-  }
+  };
 
   var unblockForm = function() {
     $('#quiz_form').find('input, textarea').prop({readOnly: false, disabled: false});
-  }
+  };
 
   var createAlert = function(title, msg, type, calback) {
     type = type || alertButtons.alert;
@@ -269,22 +281,36 @@
         window.location = res.url;
       }, 2000);
     });
-  }
+  };
 
   $(function() {
     if (config.resultID) {
       $('#quiz-selector').hide();
-      try {
-        config.resultData = JSON.parse(config.resultData);
-      } catch(e) {
-        console.log('Failt to parse answers;');
-      }
+      //config.resultData.acceptTime = Math.round((new Date()).getTime() / 1000);
+
       $('.quiz-number').text(config.resultData.quiz);
-      var acceptDate = new Date(config.resultData.submit_time * 1000);
-      $('#time_label').removeClass('hide').find('span').text(acceptDate.toLocaleString());
+      var acceptDate = new Date(config.resultData.submitTime * 1000);
+      $('#submit_time').removeClass('hide').find('span').text(acceptDate.toLocaleString());
+
+      if (config.resultData.acceptTime) {
+        $('.jumbotron h1 .label-success').removeClass('hidden');
+      } else {
+        $('.jumbotron h1 .label-default').removeClass('hidden');
+      }
 
       applyEmailId(config.resultData.email);
-      loadQuizQuestions(showQuestions);
+      loadQuizQuestions(function() {
+        if (config.resultData.acceptTime) {
+          var totalScore = _.reduce(questions, function(revenue, question, idx) {
+            // TODO: Change to resultData.answerResults
+            return config.resultData.answers['q_' + idx] ? revenue + question.revenue : revenue;
+          }, 0);
+          $('.jumbotron .alert.alert-success').removeClass('hidden');
+          $('#accept_time').find('span').text(acceptDate.toLocaleString());
+          $('#quiz_score').text(totalScore);
+        }
+        showQuestions();
+      });
     } else {
       var $id_form = $('#id_form');
       if (storage.get('email')) {

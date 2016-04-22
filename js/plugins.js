@@ -47,9 +47,20 @@
 
                 data[key] = value;
 
-                global.localStorage.setItem(storageKey, JSON.stringify(data));
+                if (supported) {
+                    global.localStorage.setItem(storageKey, JSON.stringify(data));
+                }
 
                 return old;
+            },
+            destroy: function() {
+                data = {};
+
+                if (supported) {
+                    global.localStorage.removeItem(storageKey);
+                }
+
+                return true;
             }
         };
     };

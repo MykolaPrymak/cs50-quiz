@@ -27,6 +27,7 @@
 
   var applyEmailId = function(email) {
       $('#id_form').hide().find('input').val(email);
+      $('#id_form').find('button[type="reset"]').removeClass('hide');
       $('#email_id').toggleClass('hide').find('span').first().text(email);
   };
 
@@ -156,9 +157,9 @@
       blockForm(true);
       $fg.append('<button type="submit" class="btn btn-success">Update</button>');
     } else {
-      $fg.append('<button type="submit" class="btn btn-success">Submit</button>');
-      $fg.append(' ');
-      $fg.append('<button type="reset" class="btn btn-danger">Reset</button>');
+      $fg.append('<button type="submit" class="btn btn-success">Submit</button> ');
+      $fg.append('<button type="reset" data-type="soft" class="btn btn-danger">Reset form</button>');
+      $fg.append('<button type="reset" data-type="full" class="btn btn-danger pull-right">Clear all data</button>');
     }
     $form.append($fg)
   };
@@ -324,7 +325,6 @@
       var $id_form = $('#id_form');
       if (storage.get('email')) {
         applyEmailId(storage.get('email'));
-        $id_form.find('button[type="reset"]').removeClass('hide');
 
         loadQuizQuestions(showQuestions);
       }
@@ -366,17 +366,29 @@
         });
       }).on('reset', function(evt) {
         evt.preventDefault();
-        blockForm();
+        blockForm(true);
         $(this).find('.form-group').last().hide();
 
-        showErrorMessage('Reset form?', 'This action clear all your progress. Continue?', alertButtons.reset, function(result) {
-          if (result) {
-            resetQuestions();
-          } else {
-            unblockForm();
-          }
-          $('#quiz_form').find('.form-group').last().show();
-        });
+        if ($(this).data('type') == 'soft') {
+          showErrorMessage('Reset form?', 'This action clear all your progress. Continue?', alertButtons.reset, function(result) {
+            if (result) {
+              resetQuestions();
+            } else {
+              unblockForm();
+            }
+            $('#quiz_form').find('.form-group').last().show();
+          });
+        } else {
+          showErrorMessage('Clear all data?', 'This action clear all your saved data include email and quiz progress. Continue?', alertButtons.reset, function(result) {
+            if (result) {
+              storage.destroy();
+              window.location.reload();
+            } else {
+              unblockForm();
+              $('#quiz_form').find('.form-group').last().show();
+            }
+          });
+        }
       }).on('change', function(evt) {
         storage.set(getStorageAnswerKey(), form2Hash(this));
       });
@@ -389,7 +401,9 @@
         var newQuizNumber = parseInt($this.data('number'));
         if (newQuizNumber !== quizNumber) {
           quizNumber = newQuizNumber;
-          loadQuizQuestions(showQuestions);
+          if (storage.get('email')) {
+            loadQuizQuestions(showQuestions);
+          }
         }
         $this.closest('.dropdown').toggleClass('open');
         $('.quiz-number').text(quizNumber);

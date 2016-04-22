@@ -91,7 +91,7 @@
       "title":"hello, C.",
       "subtitle":[
          "Consider the program below to which line numbers have been added for the sake of discussion.",
-         "<pre>1 #include <cs50.h>\n2 #include <stdio.h>\n3\n4 int main(void)\n5 {\n6   string s = GetString();\n7   printf(\"hello, %s\\n\", s);\n8 }"
+         "<pre>1 #include &lt;cs50.h&gt;\n2 #include &lt;stdio.h&gt;\n3\n4 int main(void)\n5 {\n6   string s = GetString();\n7   printf(\"hello, %s\\n\", s);\n8 }"
       ],
       "revenue":1,
       "description":"Explain why line 1 is present.",
@@ -121,7 +121,7 @@
       "revenue":2,
       "description":[
          "Consider the program below.",
-         "<pre>#include <stdio.h>\n\nint main(void)\n{\n  printf(\"%.1f\\n\", 1 / 10);\n}</pre>",
+         "<pre>#include &lt;stdio.h&gt;\n\nint main(void)\n{\n  printf(\"%.1f\\n\", 1 / 10);\n}</pre>",
          "When compiled and executed, this program outputs",
          "<pre>0.0</pre>",
          "even though <code>1 / 10</code> is surely 0.1! Why is this program outputting 0.0?"
@@ -132,7 +132,7 @@
       "revenue":2,
       "description":[
          "Consider the program below.",
-         "<pre>#include <stdio.h>\n\nint main(void)\n{\n  printf(\"%.28f\\n\", 0.1);\n}</pre>",
+         "<pre>#include &lt;stdio.h&gt;\n\nint main(void)\n{\n  printf(\"%.28f\\n\", 0.1);\n}</pre>",
          "When compiled and executed, this program outputs",
          "<pre>0.1000000000000000055511151231</pre>",
          "even though <code>0.1</code> is surely 0.1000000000000000000000000000! Why is this program outputting 0.1000000000000000055511151231?"

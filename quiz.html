@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>CS50 | Quiz</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <!--
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+        <link rel="stylesheet" href="%baseURL%/css/main.css">
+
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="%baseURL%/">CS50:Quiz</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar">
+              <ul class="nav navbar-nav">
+                <!--<li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>-->
+                <li class="dropdown" id="quiz-selector">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Quiz <span class="quiz-number">0</span> <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="%baseURL%/quiz/0/" data-number="0">Quiz 0</a></li>
+                    <li><a href="%baseURL%/quiz/1/" data-number="1">Quiz 1</a></li>
+                    <!--<li role="separator" class="divider"></li>-->
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+          <div class="jumbotron">
+              <h1>Quiz <span class="quiz-number">0</span> <span class="label label-primary">out of 75 points</span> <span class="label label-default hidden">Not Checked</span></h1>
+
+              <form id="id_form">
+                <div class="form-group">
+                  <p><label for="inputEmail1">Print your email on the line below.</label></p>
+                  <input type="email" name="email" class="form-control" id="inputEmail1" placeholder="bob@example.com" required="true">
+                </div>
+                <button type="submit" class="btn btn-default">Save</button>
+                <button type="reset" class="btn btn-danger hide">Cancel</button>
+              </form>
+              <p id="email_id" class="hide clearfix">User email id: <span></span> <span id="time_label" class="hide">Accepted at: <span></span></span></p>
+              <div class="alert alert-success hidden"><p>Total score: 75 points</p></div>
+          </div>
+        </div>
+
+        <div class="container-fluid">
+          <form id="quiz_form" class="form col-md-8 col-md-offset-2">
+          </form>
+        </div>
+        <div class="container-fluid">
+          <div class="col-md-8 col-md-offset-2" id="alert_container"></div>
+        </div>
+
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script src="%baseURL%/js/vendor/jquery-1.12.3.min.js"><\/script>')</script>
+        <script>window._ || document.write('<script src="%baseURL%/js/vendor/underscore-min.js"><\/script>')</script>
+        <script>%config%</script>
+        <script src="%baseURL%/js/plugins.js"></script>
+        <script src="%baseURL%/js/main.js"></script>
+
+    </body>
+</html>

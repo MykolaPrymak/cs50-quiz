@@ -1,0 +1,5 @@
+#AddDefaultCharset utf-8
+RewriteEngine on
+RewriteRule ^.*\.(js|ico|gif|jpg|jpeg|png|css|sql|php|html|txt|swf|pdf)$ - [L,QSA]
+#RewriteRule ^.*static/.*$ - [L,QSA]
+RewriteRule ^(.*)$ index.php?r=$1 [L,QSA]

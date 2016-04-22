@@ -1,0 +1,273 @@
+[
+   {
+      "title":"Binary Bulbs.",
+      "revenue":2,
+      "description":[
+         "Consider  the  \"binary  bulbs\"  below  that  collectively  represent  a  nonAnegative  integer. Each  of  the  bulbs  represents  a  bit:  a  bulb  that's  off  is  a  0,  and  a  bulb  that's  on  is  a  1.  All  of  the bulbs  are  currently  off.  And  the  rightmost  bulb  represents  the  least  significant  bit  (i.e.,  ones' place).",
+         "<img style=\"display: block; margin: 0 auto;\" src=\"/quiz/q0/img/q0_q0_0.png\" />",
+         "Suppose  that  you  want  these  bulbs  to  represent  the  decimal  integer  127.  Turn  on  the  requisite bulbs by marking any bulb that should become a 1, as by filling it in with your pen or pencil."
+      ],
+      "type":4,
+      "options":[
+         7,
+         6,
+         5,
+         4,
+         3,
+         2,
+         1,
+         0
+      ]
+   },
+   {
+      "title":"Bit-Sized Questions.",
+      "revenue":1,
+      "description":"With 3 bits, you can represent 8 distinct values. Why, then, is 7 the largest non-negative decimal integer that you can represent with 3 bits?",
+      "type":0
+   },
+   {
+      "revenue":1,
+      "description":"With n bits, how many distinct values can you represent?",
+      "type":0
+   },
+   {
+      "title":"This is CS80.",
+      "revenue":1,
+      "description":"What's <code>0x50</code> in binary?",
+      "type":0,
+      "inputType":"number",
+      "placeholder":"Type a numbers like 00011100011"
+   },
+   {
+      "revenue":1,
+      "description":"What's <code>0x50</code> in decimal?",
+      "type":0,
+      "inputType":"number",
+      "placeholder":"Type a numbers like 30 or 21"
+   },
+   {
+      "title":"Looping back to Scratch.",
+      "revenue":4,
+      "description":[
+         "Consider the Scratch script below.",
+         "<img src=\"/quiz/q0/img/q0_q5_0.png\" />",
+         "In the space below, complete the translation of this Scratch script to a C program in such a way that its output is equivalent. (Your program's structure needn't be equivalent.) Assume that say is <code>printf</code>. Output <code>\\n</code> after you output each line of text."
+      ],
+      "type":2,
+      "value":"#include <cs50.h>\n#include <stdio.h>\n\nint main(void) {"
+   },
+   {
+      "revenue":4,
+      "description":[
+         "Consider the Scratch script below.",
+         "<img src=\"/quiz/q0/img/q0_q6_0.png\" />",
+         "In the space below, complete the translation of this Scratch script to a C program in such a way that  its  output  is  equivalent.  (Your  program's  structure  needn't  be  equivalent.)  Assume  that i is an  int, that say is  <code>printf</code>, and that to change means to increment. Output <code>\\n</code> after you output each int. Don't worry about integer overflow."
+      ],
+      "type":2,
+      "value":"#include <cs50.h>\n#include <stdio.h>\n\nint main(void) {"
+   },
+   {
+      "title":"Itsa Mario again.",
+      "revenue":4,
+      "description":[
+         "Toward the beginning of World 3-7 in Nintendo's Super Mario Brothers 3, Mario encounters a grid of bricks, 5 bricks wide by 3 bricks high, inside of which is a free life! Below is a screenshot.",
+         "<img src=\"/quiz/q0/img/q0_q7_0.png\" />",
+         "Were this same grid to be printed (sans mushroom) as \"ASCII art\" using hashes (#) for bricks, it might resemble the below:",
+         "# # # # #",
+         "# # # # #",
+         "# # # # #",
+         "Complete the implementation of <code>PrintGrid</code> in the program below in such a way that it outputs (via <code>printf</code>) a grid of hashes per the specified width and height (without a mushroom)."
+      ],
+      "type":2,
+      "value":"#include <stdio.h>\n\nvoid PrintGrid(int width, int height);\n\nint main(void) {\n\tPrintGrid(5,3);\n}\n\nvoid PrintGrid(int width, int height)\n{"
+   },
+   {
+      "revenue":2,
+      "description":"A function like <code>PrintGrid</code> is said to have a side effect but not a return value. Explain the distinction.",
+      "type":2,
+      "placeholder":"PrintGrid have next side effect ..."
+   },
+   {
+      "title":"hello, C.",
+      "subtitle":[
+         "Consider the program below to which line numbers have been added for the sake of discussion.",
+         "<pre>1 #include <cs50.h>\n2 #include <stdio.h>\n3\n4 int main(void)\n5 {\n6   string s = GetString();\n7   printf(\"hello, %s\\n\", s);\n8 }"
+      ],
+      "revenue":1,
+      "description":"Explain why line 1 is present.",
+      "type":2,
+      "placeholder":"Because this line ..."
+   },
+   {
+      "revenue":1,
+      "description":"Explain why line 2 is present.",
+      "type":2,
+      "placeholder":"Because this line ..."
+   },
+   {
+      "revenue":1,
+      "description":"Explain what <code>void</code> signifies in line 4.",
+      "type":2,
+      "placeholder":"Because void is ..."
+   },
+   {
+      "revenue":2,
+      "description":"Explain, with respect to memory, exactly what <code>GetString</code> in line 6 returns.",
+      "type":2,
+      "placeholder":"GetString is return a ..."
+   },
+   {
+      "title":"Real Problems.",
+      "revenue":2,
+      "description":[
+         "Consider the program below.",
+         "<pre>#include <stdio.h>\n\nint main(void)\n{\n  printf(\"%.1f\\n\", 1 / 10);\n}</pre>",
+         "When compiled and executed, this program outputs",
+         "<pre>0.0</pre>",
+         "even though <code>1 / 10</code> is surely 0.1! Why is this program outputting 0.0?"
+      ],
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":[
+         "Consider the program below.",
+         "<pre>#include <stdio.h>\n\nint main(void)\n{\n  printf(\"%.28f\\n\", 0.1);\n}</pre>",
+         "When compiled and executed, this program outputs",
+         "<pre>0.1000000000000000055511151231</pre>",
+         "even though <code>0.1</code> is surely 0.1000000000000000000000000000! Why is this program outputting 0.1000000000000000055511151231?"
+      ],
+      "type":2
+   },
+   {
+      "title":"One Plus One.",
+      "revenue":1,
+      "description":[
+         "Consider the code below.",
+         "<pre>printf(\"%i\\n\", 1 + 1);</pre>",
+         "Assuming it's compiled and executed (as part of some program), exactly what does this line print?"
+      ],
+      "type":0
+   },
+   {
+      "revenue":2,
+      "description":[
+         "Consider the code below.",
+         "<pre>printf(\"%i\\n\", '1' + '1');</pre>",
+         "Assuming it's compiled and executed (as part of some program), why does this line not print the same?"
+      ],
+      "type":2,
+      "placeholder":"Because in this case ..."
+   },
+   {
+      "title":"An Odd Question.",
+      "revenue":3,
+      "description":"Complete the implementation of <code>odd</code> below in such a way that the function returns <code>true</code> if <code>n</code> is odd and <code>false</code> if <code>n</code> is even.",
+      "type":2,
+      "value":"bool odd(unsigned int n)\n{"
+   },
+   {
+      "title":"Curses, recursive!",
+      "subtitle":[
+         "Consider the recursive function below.",
+         "<pre>int f(int n)\n{\n  if (n <= 1)\n  {\n    return 1;\n  }\n  else\n  {\n    return n * f(n - 1);\n  }\n}</pre>"
+      ],
+      "revenue":1,
+      "description":"What does this function compute? Express your answer succinctly in English or with a mathematical formula.",
+      "type":2,
+      "placeholder":"This function compute a ..."
+   },
+   {
+      "revenue":4,
+      "description":"Complete the re-implementation of <code>f</code>, below, in such a way that the function is no longer recursive but iterative instead. Don't worry about integer overflow.",
+      "type":2,
+      "value":"int f(int n)\n{"
+   },
+   {
+      "title":"O(MG).",
+      "revenue":4,
+      "description":[
+         "Complete the table below by specifying any algorithm (that was covered in a lecture or short) whose running time falls within the specified lower (Ω) and upper (O) bounds, just as we've done for you with stupid sort. Assume that the input to each algorithm is an array of size <code>n</code>. Take care not to specify any algorithm more than once.",
+         "<table class=\"table table-bordered\"><thead><tr><th></th><th>Ω</th><th>O</th></tr></thead><tbody><tr><th>1) ???</th><td>1</td><td>n</td></tr><tr><th>2) ???</th><td>n log n</td><td>n log n</td></tr><tr><th>3) ???</th><td>n</td><td>n<sup>2<sup></td></tr><tr><th>4) ???</th><td>n<sup>2<sup></td><td>n<sup>2<sup></td></tr><tr><th>stupid sort</th><td>n</td><td>&infin;</td></tr></tbody></table>"
+      ],
+      "type":2,
+      "value":"1) \n2) \n3) \n4) "
+   },
+   {
+      "title":"Overflowing with Questions.",
+      "revenue":2,
+      "description":"What's integer overflow?",
+      "type":2,
+      "placeholder":"Integer overflow is when ..."
+   },
+   {
+      "revenue":2,
+      "description":"What's buffer overflow?",
+      "type":2,
+      "placeholder":"Buffer overflow is when ..."
+   },
+   {
+      "title":"Forgetful.",
+      "revenue":6,
+      "description":"Suppose that you've forgotten (as seems to happen annually) in which header file <code>strlen</code> is declared, and so you must re-implement it yourself. Complete the implementation of <code>strlen</code> below in such a way that it returns the length of <code>s</code>. Assume that <code>s</code> will not be <code>NULL</code>. And assume that <code>s</code> will be terminated with <code>\\0</code>, which does not count as part of its length. For instance, the length of <code>hello</code> would be <code>5</code>. Do not worry about integer overflow.",
+      "type":2,
+      "value":"int strlen(char* s)\n{"
+   },
+   {
+      "title":"Having said that...",
+      "subtitle":"Consider the remarks below, each of which sounds like an advantage but is not without an underlying disadvantage too. Complete each of the remarks, making clear the price paid (i.e., tradeoff) for the advantage.",
+      "revenue":2,
+      "description":"Merge sort tends to be faster than bubble sort. Having said that...",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"A linked list can grow and shrink to fit as many elements as needed. Having said that...",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"Binary search tends to be faster than linear search. Having said that...",
+      "type":2
+   },
+   {
+      "title":"Swapping Stories.",
+      "revenue":5,
+      "description":[
+         "Consider the program below, between whose lines some numbered arrows have been drawn for the sake of discussion.",
+         "<pre>void swap(int* a, int* b)\n{\n  3 &rarr;\n  int tmp = *a;\n  4 &rarr;\n  *a = *b;\n  5 &rarr;\n  *b = tmp;\n  6 &rarr;\n}\n\nint main(void)\n{\n  int x = 1;\n  1 &rarr;\n  int y = 2;\n  2 &rarr;\n  swap(&x, &y);\n  7 &rarr;\n}",
+         "Suppose that each of the numbered arrows represents a moment in time during this program's execution. For instance, if the program's execution is paused at numbered arrow 2, the value of <code>x</code> would be <code>1</code>, and the value of <code>y</code> would be <code>2</code>. Assume that the address of <code>x</code> would be <code>0x10</code> and that the address of <code>y</code> would be <code>0x14</code>. Record in the blank boxes below the values of this program's variables at each moment in time, whether in scope or not. Boxes for variables not (still) on the stack have been gray out.",
+         "<table class=\"table table-bordered\"><thead><tr><th></th><th>x</th><th>y</th><th>a</th><th>b</th><th>tmp</th></tr></thead><tbody><tr><th>1 &rarr;</th><td class=\"success\">?</td><td class=\"active\"></td><td class=\"active\"></td><td class=\"active\"></td><td class=\"active\"></td></tr><tr><th>2 &rarr;</th><td class=\"info\">1</td><td class=\"info\">2</td><td class=\"active\"></td><td class=\"active\"></td><td class=\"active\"></td></tr><tr><th>3 &rarr;</th><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"info\">0x10</td><td class=\"info\">0x14</td><td class=\"active\"></td></tr><tr><th>4 &rarr;</th><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td></tr><tr><th>5 &rarr;</th><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td></tr><tr><th>6 &rarr;</th><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"success\">?</td></tr><tr><th>7 &rarr;</th><td class=\"success\">?</td><td class=\"success\">?</td><td class=\"active\"></td><td class=\"active\"></td><td class=\"active\"></td></tr></tbody></table>",
+         "Write the values of the variables (x, y, a, b, tmp if aviable) separated by coma for each program step."
+      ],
+      "type":2,
+      "value":"1) \n2) 1, 2\n3) , , 0x10, 0x14\n4) \n5) \n6) \n7) "
+   },
+   {
+      "title":"Role Reversal.",
+      "subtitle":"Suppose that you encounter the error messages below during office hours next year as a CA or TF! Advise how to fix each of the errors.",
+      "revenue":2,
+      "description":"undefined reference to <code>'GetString'</code>",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"implicitly declaring library function <code>'strlen'</code>",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"more <code>'%'</code> conversions than data arguments",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"definitely lost: 40 bytes in 1 blocks",
+      "type":2
+   },
+   {
+      "revenue":2,
+      "description":"Invalid write of size 4",
+      "type":2
+   }
+]

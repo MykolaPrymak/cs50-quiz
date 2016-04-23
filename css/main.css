@@ -332,3 +332,7 @@ body {
         font-size: 25%;
     }
 }
+
+.review-mode .review-switch {
+    cursor: pointer;
+}

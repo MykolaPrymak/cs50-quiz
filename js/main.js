@@ -45,14 +45,15 @@
 
 
     if (config.resultID) {
-      if (config.resultData.acceptTime) {
-        var key = 'q_' + idx;
-        // TODO: Change to resultData.answerResults
-        //if (!( key in config.resultData.answers))
+      var key = 'q_' + idx;
+      if (config.resultData.answerResults && (key in config.resultData.answerResults)) {
+        if (config.resultData.answerResults[key]) {
+          lines[0].prepend('<span class="label label-success review-switch">Correct</span> ');
+        } else {
+          lines[0].prepend('<span class="label label-danger review-switch">Incorrect</span> ');
+        }
       } else {
-        //lines[0].prepend('<span class="label label-success">Correct</span> ');
-        //lines[0].prepend('<span class="label label-danger">Incorect</span> ');
-        lines[0].prepend('<span class="label label-default">On review</span> ');
+        lines[0].prepend('<span class="label label-default review-switch">On review</span> ');
       }
     }
     lines[0].prepend('<span class="label label-primary">'+ revenue +' point' + (revenue > 1 ? 's' : '') + '</span> ');
@@ -134,7 +135,7 @@
 
     $form.empty();
     _.each(questions, function(question, idx) {
-      $fg = $('<div class="form-group"></div>');
+      $fg = $('<div class="form-group" data-question-idx="' + idx + '"></div>');
 
       if (question.title) {
         $fg.append($('<h3>' + question.title + '</h3>'));
@@ -154,12 +155,16 @@
 
     $fg = $('<div class="form-group"></div>');
     if (config.resultID) {
-      blockForm(true);
-      $fg.append('<button type="submit" class="btn btn-success">Update</button>');
+      blockForm();
+      if (config.isTeacher) {
+        $fg.append('<button type="submit" class="btn btn-success">Submit review</button>');
+      } else {
+        $fg.append('<button type="submit" class="btn btn-success">Update</button>');
+      }
     } else {
-      $fg.append('<button type="submit" class="btn btn-success">Submit</button> ');
-      $fg.append('<button type="reset" data-type="soft" class="btn btn-danger">Reset</button>');
-      $fg.append('<button type="reset" data-type="full" class="btn btn-danger pull-right">Clear all data</button>');
+      $fg.append('<button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Submit</button> ');
+      $fg.append('<button type="reset" data-type="soft" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> Reset</button>');
+      $fg.append('<button type="reset" data-type="full" class="btn btn-danger pull-right">Clear all</button>');
     }
     $form.append($fg)
   };
@@ -210,15 +215,15 @@
     var $buttonContainer = $('<p />');
     switch(type) {
       case alertButtons.submit:
-          $buttonContainer.append('<button type="button" data-result="1" data-dismiss="alert" class="btn btn-success">Submit</button>\
-            <button type="button" class="btn btn-default" data-result="0" data-dismiss="alert">Cancel</button>');
+          $buttonContainer.append('<button type="button" data-result="1" data-dismiss="alert" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Submit</button>\
+            <button type="button" class="btn btn-default" data-result="0" data-dismiss="alert"><span class="glyphicon glyphicon-remove"></span> Cancel</button>');
         break;
       case alertButtons.reset:
-          $buttonContainer.append('<button type="button" data-result="1" data-dismiss="alert" class="btn btn-danger">Reset</button>\
-            <button type="button" class="btn btn-default" data-result="0" data-dismiss="alert">Cancel</button>');
+          $buttonContainer.append('<button type="button" data-result="1" data-dismiss="alert" class="btn btn-danger"><span class="glyphicon glyphicon-ok"></span> Reset</button>\
+            <button type="button" class="btn btn-default" data-result="0" data-dismiss="alert"><span class="glyphicon glyphicon-remove"></span> Cancel</button>');
         break;
       default:
-        $buttonContainer.append('<button type="button" data-result="1" class="btn btn-default" data-dismiss="alert">OK</button>');
+        $buttonContainer.append('<button type="button" data-result="1" class="btn btn-default" data-dismiss="alert"><span class="glyphicon glyphicon-ok"></span> OK</button>');
     }
     $buttonContainer.find('button').click(function(evt) {
       evt.preventDefault();
@@ -285,24 +290,79 @@
     });
   };
 
-  $(function() {
-    if (config.resultID) {
+  var submitReview = function() {
+    $.post(config.baseURL + '/subimt', JSON.stringify({resultID: config.resultID, quiz: config.resultData.quiz, answerResults: config.resultData.answerResults})).fail(function(xhr, status, errorThrown) {
+      var msg = status + ': ' + errorThrown;
+      if (xhr.responseText) {
+        msg = JSON.parse(xhr.responseText).message
+      }
+      showErrorMessage('Error', msg);
+    }).done(function(res) {
+      config.resultData.reviewTime = res.reviewTime;
+      config.resultData.reviewedBy = res.reviewedBy;
+      updateReviewInfo();
+      showSuccessMessage('Submit review', 'You quiz review successfully submitted.', alertButtons.alert);
+    });
+  };
 
+  var updateReviewInfo = function() {
+    if (config.resultData.reviewTime) {
+      var totalScore = _.reduce(questions, function(revenue, question, idx) {
+        return config.resultData.answerResults['q_' + idx] ? revenue + question.revenue : revenue;
+      }, 0);
+      $('.jumbotron .alert.alert-success').removeClass('hidden');
+      $('#review_time').text((new Date(config.resultData.reviewTime * 1000)).toLocaleString());
+      $('#review_by').text(config.resultData.reviewedBy);
+      $('#quiz_score').text(totalScore);
+    }
+  };
+
+  $(function() {
+    if (config.isTeacher) {
+      $('.nav.navbar-right a').text('Logout').prop('href', config.baseURL + '/logout');
+      $('#quiz_form').addClass('review-mode');
+    }
+
+    if (config.resultID) {
       $('#quiz_form').on('submit', function(evt) {
         evt.preventDefault();
+        if (config.isTeacher) {
+          if (config.resultData.answerResults) {
+            submitReview();
+          } else {
+            showErrorMessage('Submit review', 'No quiz review is provided.');
+          }
+        } else {
+          storage.set(getStorageAnswerKey(), config.resultData.answers);
+          window.location = config.baseURL;
+        }
+      }).on('click', '.review-switch', function() {
+        if (config.isTeacher) {
+          var resultData = config.resultData;
+          if (!resultData.answerResults) {
+            resultData.answerResults = {};
+          }
+          var $this = $(this);
+          var questionIdx = $this.closest('.form-group').data('questionIdx');
+          var questionKey = 'q_' + questionIdx;
 
-        storage.set(getStorageAnswerKey(), config.resultData.answers);
-        window.location = config.baseURL;
+          resultData.answerResults[questionKey] = !resultData.answerResults[questionKey];
+
+          $this.removeClass('label-default label-danger label-success');
+          if (resultData.answerResults[questionKey]) {
+            $this.addClass('label-success').text('Correct');
+          } else {
+            $this.addClass('label-danger').text('Incorrect');
+          }
+        }
       });
 
       $('#quiz-selector').hide();
-      //config.resultData.acceptTime = Math.round((new Date()).getTime() / 1000);
 
       $('.quiz-number').text(config.resultData.quiz);
-      var acceptDate = new Date(config.resultData.submitTime * 1000);
-      $('#submit_time').removeClass('hide').find('span').text(acceptDate.toLocaleString());
+      $('#submit_time').removeClass('hide').find('span').text((new Date(config.resultData.submitTime * 1000)).toLocaleString());
 
-      if (config.resultData.acceptTime) {
+      if (config.resultData.reviewTime) {
         $('.jumbotron h1 .label-success').removeClass('hidden');
       } else {
         $('.jumbotron h1 .label-default').removeClass('hidden');
@@ -310,15 +370,7 @@
 
       applyEmailId(config.resultData.email);
       loadQuizQuestions(function() {
-        if (config.resultData.acceptTime) {
-          var totalScore = _.reduce(questions, function(revenue, question, idx) {
-            // TODO: Change to resultData.answerResults
-            return config.resultData.answers['q_' + idx] ? revenue + question.revenue : revenue;
-          }, 0);
-          $('.jumbotron .alert.alert-success').removeClass('hidden');
-          $('#accept_time').find('span').text(acceptDate.toLocaleString());
-          $('#quiz_score').text(totalScore);
-        }
+        updateReviewInfo();
         showQuestions();
       });
     } else {
@@ -409,6 +461,5 @@
         $('.quiz-number').text(quizNumber);
       });
     }
-
   });
 })(jQuery);

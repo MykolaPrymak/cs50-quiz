@@ -1,16 +1,24 @@
 <?php
 /*
+ * CS50: Quiz
+ */
+
+// Uncomment next block to enable debug output
+/*
 error_reporting(E_ALL | E_STRICT | E_NOTICE);
 ini_set('display_errors', '1');
 */
 
-$secret = 'niQECdIKSkdOBO0xFL/w2Ez8AqkHn9BUJT3WyGrgcLH8c8Oj2ofv4ZmRQJv4PVCCa+PiLk2BPPf';
+// A some secret string for generate the result URLs
+$secret = '_SECRET_IS_HERE_';
+
+
+
 $base_dir = dirname(__FILE__);
 $base_url = implode('/', array_slice(explode('/', $_SERVER['PHP_SELF']), 0, -1));
 $route = explode('/', $_GET['r']);
 
 if ($route[0] == 'subimt') {
-
   $raw_post = file_get_contents('php://input');
   $json = json_decode($raw_post, true);
 

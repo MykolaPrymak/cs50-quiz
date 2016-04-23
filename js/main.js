@@ -158,7 +158,7 @@
       $fg.append('<button type="submit" class="btn btn-success">Update</button>');
     } else {
       $fg.append('<button type="submit" class="btn btn-success">Submit</button> ');
-      $fg.append('<button type="reset" data-type="soft" class="btn btn-danger">Reset form</button>');
+      $fg.append('<button type="reset" data-type="soft" class="btn btn-danger">Reset</button>');
       $fg.append('<button type="reset" data-type="full" class="btn btn-danger pull-right">Clear all data</button>');
     }
     $form.append($fg)

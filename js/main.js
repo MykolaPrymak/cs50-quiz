@@ -44,7 +44,7 @@
     var lines = mapLines(description);
 
 
-    if (config.resultID) {
+    if (config.resultId) {
       var key = 'q_' + idx;
       if (config.resultData.answerResults && (key in config.resultData.answerResults)) {
         if (config.resultData.answerResults[key]) {
@@ -154,7 +154,7 @@
     });
 
     $fg = $('<div class="form-group"></div>');
-    if (config.resultID) {
+    if (config.resultId) {
       blockForm();
       if (config.isTeacher) {
         $fg.append('<button type="submit" class="btn btn-success">Submit review</button>');
@@ -291,7 +291,7 @@
   };
 
   var submitReview = function() {
-    $.post(config.baseURL + '/subimt', JSON.stringify({resultID: config.resultID, quiz: config.resultData.quiz, answerResults: config.resultData.answerResults})).fail(function(xhr, status, errorThrown) {
+    $.post(config.baseURL + '/subimt', JSON.stringify({resultId: config.resultId, quiz: config.resultData.quiz, answerResults: config.resultData.answerResults})).fail(function(xhr, status, errorThrown) {
       var msg = status + ': ' + errorThrown;
       if (xhr.responseText) {
         msg = JSON.parse(xhr.responseText).message
@@ -321,9 +321,10 @@
     if (config.isTeacher) {
       $('.nav.navbar-right a').text('Logout').prop('href', config.baseURL + '/logout');
       $('#quiz_form').addClass('review-mode');
+      $('#navbar .navbar-nav').first().append('<li><a href="' + config.baseURL + '/submissions">Submissions</a><li>');
     }
 
-    if (config.resultID) {
+    if (config.resultId) {
       $('#quiz_form').on('submit', function(evt) {
         evt.preventDefault();
         if (config.isTeacher) {

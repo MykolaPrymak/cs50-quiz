@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>CS50 | Quiz | Login</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+        <link rel="stylesheet" href="%baseURL%/css/main.css">
+
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="%baseURL%/">CS50:Quiz</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar">
+              <ul class="nav navbar-nav">
+                <li><a href="%baseURL%/submissions">Submissions</a></li>
+                <li class="dropdown" id="quiz-selector">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span id="selected-quiz">Loading....</span> <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                  </ul>
+                </li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="%baseURL%/logout">Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+            <div class="alert alert-danger hidden"><h4>Failed loading quiz submissions.</h4></div>
+
+              <table class="table table-striped" id="quiz-results">
+                <tr>
+                  <th>#</th>
+                  <th>Email</th>
+                  <th>Submit Time</th>
+                  <th>Review Time</th>
+                  <th>Reviewed Progress</th>
+                  <th>Action</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script src="%baseURL%/js/vendor/jquery-1.12.3.min.js"><\/script>')</script>
+        <script>window._ || document.write('<script src="%baseURL%/js/vendor/underscore-min.js"><\/script>')</script>
+        <script>
+          'use strict';
+
+          (function($) {
+            $(function() {
+              %config%
+              $.getJSON(config.baseURL + '/submissions/json').fail(function() {
+                $('.alert-danger.hidden').removeClass('hidden');
+              }).done(function(results) {
+                var $quizList = $('#quiz-selector .dropdown-menu');
+                _.each(results, function(results, key) {
+                  var quizNum = parseInt(key.slice(1));
+
+                  $quizList.append('<li><a href="/submissions/q' + quizNum + '" data-results-key="' + key + '">Quiz ' + quizNum + '</a></li>');
+                });
+                $('#selected-quiz').text('Select quiz');
+                $quizList.on('click', 'a', function(evt) {
+                  evt.preventDefault();
+                  var key = $(this).data('resultsKey');
+                  var quizNum = parseInt(key.slice(1));
+
+                  $('#selected-quiz').text('Quiz ' + quizNum);
+                  var resultTable = $('#quiz-results');
+
+                  _.each(resultTable.find('tr').slice(1), function(node) {
+                    node.parentNode.removeChild(node);
+                  });
+
+                  _.each(results[key], function(result, idx) {
+                    var $tr = $('<tr />');
+
+                    $tr.append('<th>' + (idx + 1) + '</th>');
+                    $tr.append('<td>' + result.email + '</td>');
+                    $tr.append('<td>' + (new Date(result.submitTime * 1000)).toLocaleString() + '</td>');
+                    $tr.append('<td>' + (new Date(result.reviewTime * 1000)).toLocaleString() + '</td>');
+                    $tr.append('<td>' + Math.floor((result.reviewed / result.answers) * 100) + '%</td>');
+                    $tr.append('<td><a href="' + config.baseURL + '/quiz/q' + quizNum + '/' + result.resultId + '" class="btn btn-success btn-sm">View</a></td>');
+
+                    resultTable.append($tr);
+                  });
+                });
+              });
+            });
+          })(jQuery);
+        </script>
+    </body>
+</html>

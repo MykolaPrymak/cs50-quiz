@@ -50,7 +50,7 @@ if ($route[0] == 'subimt') {
   header('Content-Type: application/json');
 
   // Quiz review
-  if (is_logined() && isset($json['resultID'])) {
+  if (is_logined() && isset($json['resultId'])) {
 
     if (!isset($json['quiz']) || !isset($json['answerResults']) || empty($json['answerResults'])) {
       header ('HTTP/1.0 400 Bad Request');
@@ -58,7 +58,7 @@ if ($route[0] == 'subimt') {
       exit;
     }
 
-    $quiz_result_file = $base_dir . '/results/q' . $json['quiz'] . '/' . $json['resultID'] . '.json';
+    $quiz_result_file = $base_dir . '/results/q' . $json['quiz'] . '/' . $json['resultId'] . '.json';
 
     if (!file_exists($quiz_result_file)) {
       header ('HTTP/1.0 404 Not Found');
@@ -115,6 +115,58 @@ if ($route[0] == 'subimt') {
     echo json_encode(array('url' => implode('/', array($base_url, 'quiz', $json['quiz'], $quiz_unique))));
   }
   exit;
+} else if (is_logined() && $route[0] == 'submissions') {
+  if ($route[1] == 'json') {
+    header('Content-Type: application/json');
+    $submissions = array();
+
+    $results_dir = $base_dir . '/results/';
+
+    if (is_readable($results_dir) && ($handle = opendir($results_dir))) {
+      while (false !== ($quiz_result_dir = readdir($handle))) {
+        if ($quiz_result_dir === '.' || $quiz_result_dir === '..') continue;
+
+        if (is_dir($results_dir.$quiz_result_dir) && ($quiz_result_dir{0} === 'q')) {
+          sscanf($quiz_result_dir, "q%d", $quiz_num);
+          $submissions[$quiz_result_dir] = array();
+          $quiz_dir = $results_dir.$quiz_result_dir . '/';
+
+          // Read quiz results files
+          if (is_readable($quiz_dir) && ($quiz_dir_handle = opendir($quiz_dir))) {
+            while (false !== ($quiz_result_file = readdir($quiz_dir_handle))) {
+              if ($quiz_result_file === '.' || $quiz_result_file === '..') continue;
+
+              if (is_file($quiz_dir.$quiz_result_file)) {
+                $path_parts = pathinfo($quiz_dir.$quiz_result_file);
+                if ($path_parts['extension'] === 'json') {
+                  try {
+                      $result_data = json_decode(file_get_contents($quiz_dir.$quiz_result_file), true);
+                      $submissions[$quiz_result_dir][] = array(
+                        'resultId' => $path_parts['filename'],
+                        'email' => $result_data['email'],
+                        'submitTime' => $result_data['submitTime'],
+                        'reviewTime' => $result_data['reviewTime'],
+                        'answers' => count($result_data['answers']),
+                        'reviewed' => (isset($result_data['answerResults']) && is_array($result_data['answerResults'])) ? count($result_data['answerResults']) : 0
+                      );
+                  } catch (Exception $e) {
+                    // Show if have error parsing file
+                    $submissions[$quiz_result_dir][] = array('resultId' => $path_parts['filename'], 'error' => true);
+                  }
+                }
+              }
+            }
+          }
+          closedir($quiz_dir_handle);
+        }
+      }
+      closedir($handle);
+    }
+
+    echo json_encode($submissions);
+  } else {
+    echo str_replace(array('%baseURL%', "%config%"), array($base_url, 'var config = ' . json_encode(array('baseURL' => $base_url)) .';'), file_get_contents('submissions.html'));
+  }
 } else if ($route[0] == 'quiz') {
   $quiz_num = isset($route[1]) ? intval($route[1]) : 0;
 
@@ -132,8 +184,8 @@ if ($route[0] == 'subimt') {
     if (file_exists($result_file)) {
       $config = array(
         'baseURL' => $base_url,
-        'resultID' => $route[2],
-        'resultData' => json_decode(file_get_contents($result_file)),
+        'resultId' => $route[2],
+        'resultData' => json_decode(file_get_contents($result_file), true),
         'isTeacher' => is_logined()
       );
       echo str_replace(array('%baseURL%', '%config%'), array($base_url, 'var config = ' . json_encode($config) . ';'), file_get_contents('quiz.html'));

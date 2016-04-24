@@ -44,7 +44,7 @@ $base_dir = dirname(__FILE__);
 $base_url = implode('/', array_slice(explode('/', $_SERVER['PHP_SELF']), 0, -1));
 $route = explode('/', $_GET['r']);
 
-if ($route[0] == 'subimt') {
+if ($route[0] == 'submit') {
   $raw_post = file_get_contents('php://input');
   $json = json_decode($raw_post, true);
   header('Content-Type: application/json');

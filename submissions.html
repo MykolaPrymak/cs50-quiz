@@ -84,8 +84,10 @@
                 $('.alert-danger.hidden').removeClass('hidden');
               }).done(function(results) {
                 var $quizList = $('#quiz-selector .dropdown-menu');
-                _.each(results, function(results, key) {
+                _.each(results, function(result, key) {
                   var quizNum = parseInt(key.slice(1));
+
+                  result.sort(function(a,b) {return b.submitTime - a.submitTime;});
 
                   $quizList.append('<li><a href="/submissions/q' + quizNum + '" data-results-key="' + key + '">Quiz ' + quizNum + '</a></li>');
                 });
@@ -108,7 +110,7 @@
                     $tr.append('<th>' + (idx + 1) + '</th>');
                     $tr.append('<td>' + result.email + '</td>');
                     $tr.append('<td>' + (new Date(result.submitTime * 1000)).toLocaleString() + '</td>');
-                    $tr.append('<td>' + (new Date(result.reviewTime * 1000)).toLocaleString() + '</td>');
+                    $tr.append('<td>' + (result.reviewTime ? (new Date(result.reviewTime * 1000)).toLocaleString() : 'N/A') + '</td>');
                     $tr.append('<td>' + Math.floor((result.reviewed / result.answers) * 100) + '%</td>');
                     $tr.append('<td><a href="' + config.baseURL + '/quiz/q' + quizNum + '/' + result.resultId + '" class="btn btn-success btn-sm">View</a></td>');
 

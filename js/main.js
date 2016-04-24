@@ -26,9 +26,9 @@
   };
 
   var applyEmailId = function(email) {
-      $('#id_form').hide().find('input').val(email);
-      $('#id_form').find('button[type="reset"]').removeClass('hide');
-      $('#email_id').toggleClass('hide').find('span').first().text(email);
+    $('#id_form').hide().find('input').val(email);
+    $('#id_form').find('button[type="reset"]').removeClass('hide');
+    $('#email_id').toggleClass('hide').find('span').first().text(email);
   };
 
   var mapLines = function(lines) {
@@ -43,11 +43,12 @@
   var addDescription = function($node, description, revenue, idx) {
     var lines = mapLines(description);
 
-
     if (config.resultId) {
       var key = 'q_' + idx;
-      if (config.resultData.answerResults && (key in config.resultData.answerResults)) {
-        if (config.resultData.answerResults[key]) {
+      var answerResult = getAnswerResult(key);
+
+      if (!_.isUndefined(answerResult) && _.isBoolean(answerResult.valid)) {
+        if (answerResult.valid) {
           lines[0].prepend('<span class="label label-success review-switch">Correct</span> ');
         } else {
           lines[0].prepend('<span class="label label-danger review-switch">Incorrect</span> ');
@@ -115,7 +116,7 @@
         });
         break;
       case answerTypes.longText:
-        var $ta = $('<textarea name="q_' + idx + '" rows="5" class="form-control" placeholder="' + (question.placeholder ? question.placeholder : '') + '"></textarea>');
+        var $ta = $('<textarea name="q_' + idx + '" rows="5" class="form-control quiz-aswer" placeholder="' + (question.placeholder ? question.placeholder : '') + '"></textarea>');
 
         if (value) {
           $ta.val(value);
@@ -125,6 +126,21 @@
         break;
       default:
         $node.append('<input type="' + question.inputType + '" name="q_' + idx + '" class="form-control" value="' + value + '" placeholder="' + (question.placeholder ? question.placeholder : '') + '">');
+    }
+    if (config.resultId) {
+      var answerResult = getAnswerResult('q_' + idx);
+      var $ac;
+      if (config.isTeacher && answerResult && answerResult.comment) {
+        $ac = $('<textarea rows="5" class="form-control quiz-comment" placeholder="Add comments here...."></textarea>');
+        $ac.val(answerResult.comment);
+      } else if (config.isTeacher) {
+        $ac = $('<div><span class="btn btn-success btn-xs quiz-comment--add">Add comment</span><textarea rows="5" class="form-control quiz-comment hidden" placeholder="Add comments here...."></textarea></div>');
+      } else if (answerResult && answerResult.comment) {
+        $ac = $('<pre class="alert alert-warning" />').text(answerResult.comment);
+      }
+      if ($ac) {
+        $node.append($ac);
+      }
     }
   };
 
@@ -155,7 +171,6 @@
 
     $fg = $('<div class="form-group"></div>');
     if (config.resultId) {
-      blockForm();
       if (config.isTeacher) {
         $fg.append('<button type="submit" class="btn btn-success">Submit review</button>');
       } else {
@@ -195,7 +210,7 @@
   };
 
   var blockForm = function(force) {
-    $('#quiz_form').find('input, textarea').prop({readOnly: true, disabled: !!force});
+    $('#quiz_form').find('input, textarea.quiz-aswer').prop({readOnly: true, disabled: !!force});
   };
 
   var unblockForm = function() {
@@ -274,7 +289,7 @@
   var submitQuestions = function() {
     var answers = form2Hash($('#quiz_form'));
 
-    $.post(config.baseURL + '/subimt', JSON.stringify({email: storage.get('email'), quiz: quizNumber, answers: answers})).fail(function(xhr, status, errorThrown) {
+    $.post(config.baseURL + '/submit', JSON.stringify({email: storage.get('email'), quiz: quizNumber, answers: answers})).fail(function(xhr, status, errorThrown) {
       var msg = status + ': ' + errorThrown;
       if (xhr.responseText) {
         msg = JSON.parse(xhr.responseText).message
@@ -290,8 +305,12 @@
     });
   };
 
+  var getAnswerResult = function(answerKey) {
+    return config.resultData && config.resultData.answerResults && config.resultData.answerResults[answerKey];
+  };
+
   var submitReview = function() {
-    $.post(config.baseURL + '/subimt', JSON.stringify({resultId: config.resultId, quiz: config.resultData.quiz, answerResults: config.resultData.answerResults})).fail(function(xhr, status, errorThrown) {
+    $.post(config.baseURL + '/submit', JSON.stringify({resultId: config.resultId, quiz: config.resultData.quiz, answerResults: config.resultData.answerResults})).fail(function(xhr, status, errorThrown) {
       var msg = status + ': ' + errorThrown;
       if (xhr.responseText) {
         msg = JSON.parse(xhr.responseText).message
@@ -308,7 +327,8 @@
   var updateReviewInfo = function() {
     if (config.resultData.reviewTime) {
       var totalScore = _.reduce(questions, function(revenue, question, idx) {
-        return config.resultData.answerResults['q_' + idx] ? revenue + question.revenue : revenue;
+        var answerResult = getAnswerResult('q_' + idx);
+        return (answerResult && answerResult.valid) ? revenue + question.revenue : revenue;
       }, 0);
       $('.jumbotron .alert.alert-success').removeClass('hidden');
       $('#review_time').text((new Date(config.resultData.reviewTime * 1000)).toLocaleString());
@@ -337,6 +357,23 @@
           storage.set(getStorageAnswerKey(), config.resultData.answers);
           window.location = config.baseURL;
         }
+      }).on('change', function(evt) {
+        if (config.isTeacher) {
+          var $target = $(evt.target);
+          var resultData = config.resultData;
+          if ($target.is('.quiz-comment')) {
+            if (!resultData.answerResults) {
+              resultData.answerResults = {};
+            }
+            var questionIdx = $target.closest('.form-group').data('questionIdx');
+            var questionKey = 'q_' + questionIdx;
+
+            if (!resultData.answerResults[questionKey]) {
+              resultData.answerResults[questionKey] = {};
+            }
+            resultData.answerResults[questionKey].comment = evt.target.value;
+          }
+        }
       }).on('click', '.review-switch', function() {
         if (config.isTeacher) {
           var resultData = config.resultData;
@@ -347,15 +384,20 @@
           var questionIdx = $this.closest('.form-group').data('questionIdx');
           var questionKey = 'q_' + questionIdx;
 
-          resultData.answerResults[questionKey] = !resultData.answerResults[questionKey];
+          if (!resultData.answerResults[questionKey]) {
+            resultData.answerResults[questionKey] = {};
+          }
+          resultData.answerResults[questionKey].valid = !resultData.answerResults[questionKey].valid;
 
           $this.removeClass('label-default label-danger label-success');
-          if (resultData.answerResults[questionKey]) {
+          if (resultData.answerResults[questionKey].valid) {
             $this.addClass('label-success').text('Correct');
           } else {
             $this.addClass('label-danger').text('Incorrect');
           }
         }
+      }).on('click', '.quiz-comment--add', function() {
+        $(this).addClass('hidden').siblings('.quiz-comment').removeClass('hidden').focus();
       });
 
       $('#quiz-selector').hide();
@@ -373,6 +415,7 @@
       loadQuizQuestions(function() {
         updateReviewInfo();
         showQuestions();
+        blockForm();
       });
     } else {
       var $id_form = $('#id_form');
@@ -442,7 +485,7 @@
             }
           });
         }
-      }).on('change', function(evt) {
+      }).on('change', function() {
         storage.set(getStorageAnswerKey(), form2Hash(this));
       });
 
